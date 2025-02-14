@@ -56,7 +56,10 @@ class Document(models.Model):
 
     class Meta:
         db_table = 'tbl_documents'
-        managed = True 
+        managed = True
+
+    def __str__(self):
+        return self.title
 
 # Modelo de Logs
 class Log(models.Model):

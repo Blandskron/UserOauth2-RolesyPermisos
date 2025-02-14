@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Aplicación</title>
+</head>
+<body>
+    <h1>Bienvenido a la aplicación</h1>
+    
+    <div id="upload" style="display:none;">
+        <h2>Subir archivo</h2>
+        <form id="upload-form" enctype="multipart/form-data">
+            <label for="file">Selecciona un archivo:</label>
+            <input type="file" id="file" name="file" required>
+            <br><br>
+            <button type="submit">Subir archivo</button>
+        </form>
+        <br>
+        <button id="logout">Cerrar sesión</button>
+        <br>
+        <h3>Archivos Subidos</h3>
+        <ul id="files-list"></ul>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const authToken = localStorage.getItem("authToken");
+    
+            if (!authToken) {
+                window.location.href = "login.html"; // Redirigir a login si no está autenticado
+            } else {
+                document.getElementById("upload").style.display = "block";
+                fetchFiles(); // Llamar a la función para obtener archivos si es necesario
+            }
+        });
+    
+        function fetchFiles() {
+            console.log("Usuario autenticado. Cargando archivos...");
+            // Aquí puedes agregar la lógica para obtener archivos si es necesario
+        }
+    
+        document.getElementById("logout").addEventListener("click", function () {
+            localStorage.removeItem("authToken");
+            window.location.href = "login.html"; // Redirigir a login al cerrar sesión
+        });
+    </script>
+    
+</body>
+</html>

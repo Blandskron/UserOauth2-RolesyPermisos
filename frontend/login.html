@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mi Aplicación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2, h3 {
+            color: #2d3e50;
+        }
+
+        #login-section, #app-section {
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin: 8px 0 5px;
+        }
+
+        input[type="email"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+        }
+
+        #app-section {
+            display: none;
+        }
+
+        #files-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #files-list li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sección de Login -->
+    <div id="login-section">
+        <h1 class="section-header">Login</h1>
+        <form id="login-form" aria-live="polite">
+            <label for="email">Correo electrónico:</label>
+            <input type="email" id="email" name="email" required placeholder="Introduce tu correo electrónico">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required placeholder="Introduce tu contraseña">
+            <button type="submit">Iniciar sesión</button>
+        </form>
+        <a href="register.html">¿No tienes cuenta? Regístrate</a><br>
+        <a href="#" id="logout-login">Cerrar sesión</a>
+    </div>
+
+    <!-- Sección de Aplicación (Oculta hasta iniciar sesión) -->
+    <div id="app-section">
+        <h1 class="section-header">Bienvenido a la aplicación</h1>
+        <div id="upload">
+            <h2>Subir archivo</h2>
+            <form id="upload-form" enctype="multipart/form-data">
+                <label for="file">Selecciona un archivo:</label>
+                <input type="file" id="file" name="file" required>
+                <button type="submit">Subir archivo</button>
+            </form>
+            <br>
+            <button id="logout">Cerrar sesión</button>
+            <h3>Archivos Subidos</h3>
+            <ul id="files-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Función para obtener el token CSRF desde las cookies
+        function getCSRFToken() {
+            const cookieValue = document.cookie.match('(^|;)\\s*csrftoken\\s*=\\s*([^;]+)');
+            return cookieValue ? cookieValue.pop() : '';
+        }
+
+        // Verificar si el usuario ya está autenticado
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const loginSection = document.getElementById('login-section');
+            const appSection = document.getElementById('app-section');
+
+            if (token) {
+                loginSection.style.display = 'none';
+                appSection.style.display = 'block';
+            } else {
+                loginSection.style.display = 'block';
+                appSection.style.display = 'none';
+            }
+        }
+
+        // Función para manejar el inicio de sesión
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://127.0.0.1:9090/users/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFTOKEN': getCSRFToken(),
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.status === 200 && data.token) {
+                    localStorage.setItem('authToken', data.token);
+                    alert('Login exitoso');
+                    checkAuth();
+                } else {
+                    alert('Credenciales incorrectas');
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                alert('Error al intentar iniciar sesión');
+            }
+        });
+
+        // Función para manejar el cierre de sesión
+        function logout() {
+            localStorage.removeItem('authToken');
+            checkAuth();
+        }
+
+        // Asignar evento de cierre de sesión a los botones correspondientes
+        document.getElementById('logout').addEventListener('click', logout);
+        document.getElementById('logout-login').addEventListener('click', logout);
+
+        // Verificar autenticación al cargar la página
+        checkAuth();
+    </script>
+
+</body>
+
+</html>

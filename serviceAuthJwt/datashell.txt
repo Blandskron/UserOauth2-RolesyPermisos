@@ -1,0 +1,71 @@
+python manage.py shell
+
+from django.contrib.auth.models import Group, Permission
+
+# Crear Grupos
+admin_group = Group.objects.create(name='Admin')
+editor_group = Group.objects.create(name='Editor')
+viewer_group = Group.objects.create(name='Viewer')
+
+# Crear permisos
+permission_add_doc = Permission.objects.get(codename='add_document')
+permission_change_doc = Permission.objects.get(codename='change_document')
+permission_delete_doc = Permission.objects.get(codename='delete_document')
+
+# Asignar permisos a los grupos
+admin_group.permissions.set([permission_add_doc, permission_change_doc, permission_delete_doc])
+editor_group.permissions.set([permission_add_doc, permission_change_doc])
+viewer_group.permissions.set([permission_add_doc])
+
+from django.contrib.auth import get_user_model
+
+# Crear usuarios
+user1 = get_user_model().objects.create_user(email='admin@example.com', password='admin123')
+user2 = get_user_model().objects.create_user(email='editor@example.com', password='editor123')
+user3 = get_user_model().objects.create_user(email='viewer@example.com', password='viewer123')
+
+# Asignar usuarios a los grupos
+user1.groups.add(admin_group)
+user2.groups.add(editor_group)
+user3.groups.add(viewer_group)
+
+# Guardar usuarios
+user1.save()
+user2.save()
+user3.save()
+
+
+from datetime import datetime
+from core.models import Document
+from django.utils import timezone
+
+# Crear documentos
+doc1 = Document.objects.create(
+    title='Document 1',
+    hash_name='hash1',
+    path='/path/to/document1',
+    mime_type='application/pdf',
+    size_bytes=1024,
+    local_create_time=datetime.now(),
+    server_create_time=datetime.now(),
+    owner=user1  # El dueño será el usuario admin
+)
+
+doc2 = Document.objects.create(
+    title='Document 2',
+    hash_name='hash2',
+    path='/path/to/document2',
+    mime_type='application/pdf',
+    size_bytes=2048,
+    local_create_time=datetime.now(),
+    server_create_time=datetime.now(),
+    owner=user2  # El dueño será el usuario editor
+)
+
+# Agregar los documentos a los grupos correspondientes
+doc1.groups.add(admin_group, editor_group)  # El doc1 será accesible para Admin y Editor
+doc2.groups.add(editor_group, viewer_group)  # El doc2 será accesible para Editor y Viewer
+
+# Guardar documentos
+doc1.save()
+doc2.save()

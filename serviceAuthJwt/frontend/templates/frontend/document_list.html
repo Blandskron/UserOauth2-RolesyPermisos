@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Documents</title>
+</head>
+<body>
+    <h2>Documents</h2>
+
+    <!-- Si el usuario tiene permiso para agregar documentos -->
+    {% if can_add %}
+        <a href="{% url 'add_document' %}">Create New Document</a><br>
+    {% endif %}
+
+    <ul>
+        {% for document in documents %}
+            <li>
+                {{ document.title }} - {{ document.path }}
+
+                <!-- Si el usuario tiene permiso para editar documentos -->
+                {% if can_change %}
+                    <a href="{% url 'edit_document' document.id %}">Edit</a>
+                {% endif %}
+
+                <!-- Si el usuario tiene permiso para eliminar documentos -->
+                {% if can_delete %}
+                    <a href="{% url 'delete_document' document.id %}">Delete</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>

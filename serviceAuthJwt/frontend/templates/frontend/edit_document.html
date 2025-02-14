@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Document</title>
+</head>
+<body>
+    <h2>Edit Document</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="title">Title:</label><br>
+        <input type="text" name="title" value="{{ document.title }}" required><br>
+        <label for="path">Path:</label><br>
+        <input type="text" name="path" value="{{ document.path }}" required><br>
+        <input type="submit" value="Save Changes">
+    </form>
+</body>
+</html>

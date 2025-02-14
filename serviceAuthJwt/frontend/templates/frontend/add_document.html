@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Document</title>
+</head>
+<body>
+    <h2>Create New Document</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="title">Title:</label><br>
+        <input type="text" name="title" required><br>
+        <label for="path">Path:</label><br>
+        <input type="text" name="path" required><br>
+        <label for="mime_type">MIME Type:</label><br>
+        <input type="text" name="mime_type" required><br>
+        <label for="size_bytes">Size (bytes):</label><br>
+        <input type="number" name="size_bytes" required><br>
+        <label for="local_create_time">Local Create Time:</label><br>
+        <input type="datetime" name="local_create_time"><br>
+        <label for="server_create_time">Server Create Time:</label><br>
+        <input type="datetime" name="server_create_time"><br>
+        <input type="submit" value="Create">
+    </form>
+</body>
+</html>
